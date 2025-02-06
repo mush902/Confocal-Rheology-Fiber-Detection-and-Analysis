@@ -892,7 +892,7 @@ def detect_cycles2(graph):
                     graph.remove_edge(node1, node2)
 
 
-def setup_csv(output_path="frame_metrics_2.csv"):
+def setup_csv(output_path="frame_metrics.csv"):
     headers = ['Frame', 'Component ID', 'Total Length', 'Average Slope', 'Average Curvature']
     with open(output_path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
