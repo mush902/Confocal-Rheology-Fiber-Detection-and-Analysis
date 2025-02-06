@@ -59,7 +59,7 @@ The script generates:
 - Visualization of branch points and centerline detection
 
 ## Output CSV Format
-The analysis generates `frame_metrics_2.csv` with the following structure:
+The analysis generates `frame_metrics.csv` with the following structure:
 
 | Column | Description |
 |--------|-------------|
