@@ -1,3 +1,5 @@
+import sys
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -960,12 +962,16 @@ def find_longest_leaf_path(G, previous_leaf_nodes):
 
 if __name__ == "__main__":
 
-    tiff_path = 'skeleton.tif'
+    if len(sys.argv) < 3:
+        print("Usage: python calculate_component_metrics.py <skeleton.tif> <confocal.tif>")
+        sys.exit(1)
+
+    tiff_path = sys.argv[1]
+    overlay_tiff = sys.argv[2]
     img = Image.open(tiff_path)
     frames = []
     start_frame = 1
     end_frame = 2
-    overlay_tiff = 'fiber.tif'
     img_overlay = Image.open(overlay_tiff)
     save_directory = 'Plots'
     curvature_rms_list = []
