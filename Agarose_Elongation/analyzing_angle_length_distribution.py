@@ -361,16 +361,21 @@ def process_tiff_file(tiff_path, output_dir, bin_size, component_length_threshol
     df.insert(0, 'frame', frame_numbers)
     csv_path = os.path.join(output_dir, f"{base_name}_matrix.csv")
     df.to_csv(csv_path, index=False)
-    heatmap_path = generate_heatmap(df, output_dir, base_name, bin_size, component_length_threshold)
-    video_path = generate_animation(df, output_dir, base_name, bin_size, component_length_threshold)
+    #heatmap_path = generate_heatmap(df, output_dir, base_name, bin_size, component_length_threshold)
+    #video_path = generate_animation(df, output_dir, base_name, bin_size, component_length_threshold)
     surface3d_path = generate_3d_surface_plot(df, output_dir, base_name, bin_size, component_length_threshold)
-
+    return {
+        'csv_path': csv_path,
+        'surface3d_path': surface3d_path
+    }
+    '''
     return {
         'csv_path': csv_path,
         'heatmap_path': heatmap_path,
         'video_path': video_path,
         'surface3d_path': surface3d_path
     }
+    '''
 
     
 #Example command - python analyzing_angle_length_distribution.py <path to skeleton file> [bin_size] [component_length_threshold]
@@ -389,10 +394,10 @@ def main():
     if result:
         print(f"Successfully processed {filename}:")
         print(f" - Matrix CSV: {result['csv_path']}")
-        if result['heatmap_path']:
-            print(f" - Heatmap: {result['heatmap_path']}")
-        if result['video_path']:
-            print(f" - Animation: {result['video_path']}")
+        #if result['heatmap_path']:
+        #    print(f" - Heatmap: {result['heatmap_path']}")
+        #if result['video_path']:
+        #    print(f" - Animation: {result['video_path']}")
         if result['surface3d_path']:
             print(f" - 3D Heatmap: {result['surface3d_path']}")            
 
