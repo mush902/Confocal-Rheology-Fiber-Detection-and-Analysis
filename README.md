@@ -12,21 +12,13 @@ A Python-based tool for analyzing fiber skeleton images and computing shape metr
 
 ## Dependencies
 
-Create a `requirements.txt` file with:
-
-numpy
-matplotlib
-networkx
-pandas
-scikit-learn
-scipy
-Pillow
+Dependencies can be found in `requirements.txt` file in the root directory.
 
 ## Installation
 
 ```bash
-git clone https://github.com/yourusername/cell-shape-analysis
-cd cell-shape-analysis
+git clone https://github.com/mush902/Confocal-Rheology-Fiber-Detection-and-Analysis.git
+cd Confocal-Rheology-Fiber-Detection-and-Analysis/
 pip install -r requirements.txt
 ```
 
@@ -40,7 +32,7 @@ pip install -r requirements.txt
 ### Running the Analysis
 
 ```bash
-python calculate_component_metrics.py
+python calculate_component_metrics.py skeleton.tif fiber.tif
 ```
 
 ### Output
