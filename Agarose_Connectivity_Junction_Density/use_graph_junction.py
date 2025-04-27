@@ -68,7 +68,7 @@ def process_graph(G, confocal_frame, output_dir):
     return junction_df
 
 
-def visualize_graph(G, junction_df, frame):
+def visualize_graph(G, junction_df, frame, output_dir):
     plt.figure(figsize=(10, 10))
     plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
     plt.imshow(frame)
@@ -86,6 +86,9 @@ def visualize_graph(G, junction_df, frame):
     plt.axis('off')
     plt.title("Skeleton Graph with Junction Nodes", pad=10)
     plt.gca().invert_yaxis()
+    output_path = os.path.join(output_dir, f"overlays.png")
+    plt.savefig(output_path)
+    plt.close()
     plt.show()
 
 
@@ -102,7 +105,7 @@ def process_tiff_file(skeleton_file, confocal_file, output_dir):
         G = create_graph_from_skeleton(skeleton_frame)
         detect_cycles(G)
         junction_df = process_graph(G, confocal_frame, output_dir)
-        visualize_graph(G, junction_df, confocal_frame)
+        visualize_graph(G, junction_df, confocal_frame, output_dir)
 
 
 #Example command to launch run - python3 use_graph_junction.py <path to skeleton file> <path to confocal file>
