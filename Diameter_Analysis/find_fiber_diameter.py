@@ -230,13 +230,13 @@ def partition_graph(G):
     return components
 
 
-def process_components_for_fibers(fiber_subgraphs, binarised_frame):
+def process_components_for_fibers(fiber_subgraphs, binarised_frame, component_length_threshold):
     results = []
     for graph_id, graph in enumerate(fiber_subgraphs):
         components = partition_graph(graph)
         for component_id, comp in enumerate(components):
             contour_length = calculate_contour_length(comp)
-            if contour_length < 10:
+            if contour_length < component_length_threshold:
                 continue
             diameter_auxillary_data = find_middle_and_perpendicular(comp, binarised_frame)
             component_data = {
@@ -250,7 +250,7 @@ def process_components_for_fibers(fiber_subgraphs, binarised_frame):
     return results        
 
 
-def plot_components_for_fiber(result, binarised_frame):
+def plot_components_for_fiber(result, binarised_frame, output_dir):
     plt.figure(figsize=(10, 10))
     plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
     plt.imshow(binarised_frame, cmap="gray")
@@ -279,12 +279,12 @@ def plot_components_for_fiber(result, binarised_frame):
         middle_node = auxillary_data["middle_node"]
         # minus_one = middle_nodes["middle_minus_1"]
         # plus_one = middle_nodes["middle_plus_1"]
-        plt.scatter(middle_node[1], middle_node[0], s=20, color="cyan")
+        plt.scatter(middle_node[1], middle_node[0], s=10, color="cyan")
         # plt.scatter(minus_one[1], minus_one[0], s=20, color="cyan")
         # plt.scatter(plus_one[1], plus_one[0], s=20, color="cyan")
         perp_line_extended = auxillary_data["extended_perpendicular_line"]
         (y1, x1), (y2, x2) = perp_line_extended
-        plt.plot([x1, x2], [y1, y2], color='cyan', linewidth=5, linestyle='-')
+        plt.plot([x1, x2], [y1, y2], color='cyan', linewidth=2, linestyle='-')
 
         # perp_line = auxillary_data["perpendicular_line"]
         # (y1, x1), (y2, x2) = perp_line
@@ -296,6 +296,10 @@ def plot_components_for_fiber(result, binarised_frame):
     plt.axis('off')
     plt.title("Skeleton Graph", pad=10)
     #plt.gca().invert_yaxis()
+    output_path = os.path.join(output_dir, f"diameter_overlay.png")
+    plt.savefig(output_path)
+    plt.close()
+
     plt.show()
 
 
@@ -340,7 +344,7 @@ def write_diameters_to_csv(result, output_dir):
     # print(f"\nOverall average diameter: {overall_avg:.4f}")
 
 
-def process_tiff_file(skeleton_file, binarised_file, output_dir):
+def process_tiff_file(skeleton_file, binarised_file, output_dir, component_length_threshold):
     skeleton_img = Image.open(skeleton_file)
     binarised_img = Image.open(binarised_file)
     total_frames = skeleton_img.n_frames
@@ -353,23 +357,24 @@ def process_tiff_file(skeleton_file, binarised_file, output_dir):
         G = create_graph_from_skeleton(skeleton_frame)
         detect_cycles(G)
         fiber_subgraphs = create_graphs_for_fiber(G)
-        result = process_components_for_fibers(fiber_subgraphs, binarised_frame)
-        plot_components_for_fiber(result, binarised_frame)
+        result = process_components_for_fibers(fiber_subgraphs, binarised_frame, component_length_threshold)
+        plot_components_for_fiber(result, binarised_frame, output_dir)
         print(f'Processed frame number {frame_idx}')
         write_diameters_to_csv(result, output_dir)
 
 
-#Example Command -  python find_fiber_diameter.py <path to skeleton file> <path to binarised file>
+#Example Command -  python find_fiber_diameter.py <path to skeleton file> <path to binarised file> [component threshold length]
 def main():
     if len(sys.argv) < 3:
-        print("Usage: python find_fiber_diameter.py <skeleton.tif> <binarised.tif>")
+        print("Usage: python find_fiber_diameter.py <skeleton.tif> <binarised.tif> [component_threshold_length]")
         sys.exit(1)
     skeleton_file = sys.argv[1]
     binarised_file = sys.argv[2]
+    component_length_threshold = int(sys.argv[3]) if len(sys.argv) >= 4 else 10
     output_dir = "fiber_analysis_output"
     os.makedirs(output_dir, exist_ok=True)
     print(f"\nProcessing skelton file: {skeleton_file} binarised file {binarised_file}")
-    process_tiff_file(skeleton_file, binarised_file, output_dir)           
+    process_tiff_file(skeleton_file, binarised_file, output_dir, component_length_threshold)           
 
 
 if __name__ == "__main__":
