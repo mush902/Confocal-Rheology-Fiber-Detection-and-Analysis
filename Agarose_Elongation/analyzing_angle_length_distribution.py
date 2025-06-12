@@ -229,10 +229,14 @@ def get_angle_length_distribution(results, bin_size):
                 bin_lengths[bin_range].append(length)
                 break    
     distribution = {}
+    count = {}
+    sum_length ={}
     for br in bin_ranges:
         avg = np.mean(bin_lengths[br]) if bin_lengths[br] else 0.0
-        distribution[br] = avg    
-    return distribution
+        distribution[br] = avg 
+        count[br] = len(bin_lengths[br])   
+        sum_length[br] = np.sum(bin_lengths[br])
+    return distribution, count, sum_length
 
 
 def generate_3d_surface_plot(df, output_dir, base_name, bin_size, component_length_threshold):
@@ -338,9 +342,30 @@ def generate_animation(df, output_dir, base_name, bin_size, component_length_thr
     return video_path
 
 
+def write_output_csv(frame_numbers, output_dir, base_name, raw_results, matrix_data_count_distribution, matrix_data_sum_length_distribution):
+
+    df = pd.DataFrame(raw_results)
+    df.insert(0, 'frame', frame_numbers)
+    csv_path = os.path.join(output_dir, f"{base_name}_raw_results.csv")
+    df.to_csv(csv_path, index=False)
+
+    df = pd.DataFrame(matrix_data_count_distribution)
+    df.insert(0, 'frame', frame_numbers)
+    csv_path = os.path.join(output_dir, f"{base_name}_matrix_count.csv")
+    df.to_csv(csv_path, index=False)
+
+    df = pd.DataFrame(matrix_data_sum_length_distribution)
+    df.insert(0, 'frame', frame_numbers)
+    csv_path = os.path.join(output_dir, f"{base_name}_matrix_sum_length.csv")
+    df.to_csv(csv_path, index=False)
+
+
 def process_tiff_file(tiff_path, output_dir, bin_size, component_length_threshold):
     base_name = os.path.splitext(os.path.basename(tiff_path))[0]
-    matrix_data = []
+    matrix_data_average_distribution = []
+    matrix_data_count_distribution = []
+    matrix_data_sum_length_distribution = []
+    raw_results = []
     frame_numbers = []
     img = Image.open(tiff_path)
     total_frames = img.n_frames
@@ -351,16 +376,21 @@ def process_tiff_file(tiff_path, output_dir, bin_size, component_length_threshol
         G = create_graph_from_skeleton(frame)
         detect_cycles(G)
         fiber_subgraphs = create_graphs_for_fiber(G)
-        results = process_components_for_fibers(fiber_subgraphs, component_length_threshold)             
-        distribution = get_angle_length_distribution(results, bin_size)
-        matrix_data.append(distribution)
+        results = process_components_for_fibers(fiber_subgraphs, component_length_threshold)
+        raw_results.append(results)             
+        distribution, count_distribution, sum_length_distribution = get_angle_length_distribution(results, bin_size)
+        matrix_data_average_distribution.append(distribution)
+        matrix_data_count_distribution.append(count_distribution)
+        matrix_data_sum_length_distribution.append(sum_length_distribution)
         frame_numbers.append(frame_idx)
         print(f'Processed frame number {frame_idx}')
     
-    df = pd.DataFrame(matrix_data)
+    df = pd.DataFrame(matrix_data_average_distribution)
     df.insert(0, 'frame', frame_numbers)
     csv_path = os.path.join(output_dir, f"{base_name}_matrix.csv")
     df.to_csv(csv_path, index=False)
+
+    write_output_csv(frame_numbers, output_dir, base_name, raw_results, matrix_data_count_distribution, matrix_data_sum_length_distribution)
     #heatmap_path = generate_heatmap(df, output_dir, base_name, bin_size, component_length_threshold)
     #video_path = generate_animation(df, output_dir, base_name, bin_size, component_length_threshold)
     surface3d_path = generate_3d_surface_plot(df, output_dir, base_name, bin_size, component_length_threshold)
