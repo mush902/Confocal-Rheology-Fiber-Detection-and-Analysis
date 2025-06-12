@@ -44,7 +44,10 @@ python analyzing_angle_length_distribution.py InputData/RegionRightTop/skeleton.
 
 ## Output
 The script creates an output folder named `fiber_analysis_output/` containing:
-- `skeleton_matrix.csv`: Raw data matrix of angle distribution over frames
+- `skeleton_matrix.csv`: Angle Length distribution over frames
+- `skeleton_matrix_count.csv`: Angle Count distribution over frame
+- `skeleton_matrix_sum_length.csv`: Angle Sum Length distribution over frame
+- `skeleton_raw_results.csv`: Raw data of fiber skeleton
 - `skeleton_heatmap_final.png`: Heatmap visualization showing angle distribution evolution
 - `skeleton_evolution.mp4`: Animation of angle distribution changes across frames
 - `skeleton_3d_surface_plot.png`: 3D surface plot of fiber length vs angle vs time
